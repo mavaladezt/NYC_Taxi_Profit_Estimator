@@ -11,5 +11,5 @@ rownames(state_stat) <- NULL
 # create variable with colnames as choice
 choice <- colnames(state_stat)[-1]
 
-df_daily_overview <- fread("df_daily_overview.csv")
+df_overview <- fread("df_overview.csv")
 

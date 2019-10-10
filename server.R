@@ -57,37 +57,37 @@ shinyServer(function(input, output) {
         # Highlight selected column using formatStyle
     })
     output$passengers <- renderInfoBox({
-        total_passengers <- round(sum(df_daily_overview$passengers))
-        infoBox('Passengers', total_passengers, icon = icon("users"))
+        total_passengers <- round(sum(df_overview$passengers))
+        infoBox('Passengers', prettyNum(total_passengers,big.mark=","), icon = icon("users"))
     })
     
     output$sales <- renderInfoBox({
-        total_sales <- round(sum(df_daily_overview$amount_total))
-        infoBox('Sales', paste("$",total_sales), icon = icon("money-bill-alt"),color='green')
+        total_sales <- round(sum(df_overview$amount_total))
+        infoBox('Sales', paste("$",prettyNum(total_sales,big.mark = ",")), icon = icon("money-bill-alt"),color='green')
     })
     
     output$contribution <- renderInfoBox({
-        total_contribution <- round(sum(df_daily_overview[,c(7,9,10)]))
-        infoBox('Contribution', paste("$",total_contribution), icon = icon("hand-holding-usd"),color='olive')
+        total_contribution <- round(sum(df_overview[,c(7,9,10)]))
+        infoBox('Contribution', paste("$",prettyNum(total_contribution,big.mark=",")), icon = icon("hand-holding-usd"),color='olive')
     })
     
     output$distance <- renderInfoBox({
-        total_distance <- round(df_daily_overview$distance/df_daily_overview$trips)
-        infoBox('Distance (Avg)', paste(total_distance,"mi"), color='navy')
+        total_distance <- round(df_overview$distance/df_overview$trips)
+        infoBox('Distance (Avg)', paste(prettyNum(total_distance,big.mark=","),"mi"), color='navy')
     })
     
     output$trips <- renderInfoBox({
-        total_trips <- round(sum(df_daily_overview$trips))
-        infoBox('Trips', total_trips, icon = icon("shipping-fast"),color='orange')
+        total_trips <- round(sum(df_overview$trips))
+        infoBox('Trips', prettyNum(total_trips,big.mark=","), icon = icon("shipping-fast"),color='orange')
     })
     
     output$duration <- renderInfoBox({
-        total_duration <- round(df_daily_overview$duration/df_daily_overview$trips)
+        total_duration <- round(df_overview$duration/df_overview$trips)
         infoBox('Duration (Avg)', paste(total_duration,"mins"), icon = icon("hourglass-start"),color='light-blue')
     })
     
     output$speed <- renderInfoBox({
-        total_speed <- round((df_daily_overview$distance/df_daily_overview$trips)/((df_daily_overview$duration/df_daily_overview$trips)/60))
+        total_speed <- round((df_overview$distance/df_overview$trips)/((df_overview$duration/df_overview$trips)/60))
         infoBox('Speed', paste(total_speed,"mph"), icon = icon("tachometer-alt"),color='yellow')
     })
     
