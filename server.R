@@ -1,33 +1,73 @@
+fib <- function(n) {n*2.01}
+
+
 shinyServer(function(input, output) {
-    output$map <- renderGvis({
-        gvisGeoChart(
-            state_stat,
-            "state.name",
-            input$selected,
-            options = list(
-                region = "US",
-                displayMode = "regions",
-                resolution = "provinces",
-                width = "auto",
-                height = "auto"
-            )
-        )
-        # using width="auto" and height="auto" to
-        # automatically adjust the map size
-    })
+    
+    currentFib <- function() {
+        fib(as.numeric(input$car_life))
+    }
+    
+    output$nthValue <- renderInfoBox({ 
+        infoBox('nthValue', prettyNum(currentFib(),big.mark=","), icon = icon("chart-line"),color='blue')})
+    
+    
+    output$voladora <- renderPlot(
+
+        
+        ggplot(wat,aes(x=desc,fill=type)) +
+            geom_rect(aes(xmin=id-.45,xmax=id+.45,ymin=end,ymax=start)) +
+            scale_x_discrete(labels=xlabels) +
+            ggtitle("Average NYC Yellow Taxi Trip") +
+            theme(plot.title = element_text(hjust=0.5))
+    )
     
     # Reactive expression to create data frame of all input values ----
     sliderValues <- reactive({
         
         data.frame(
-            Name = c("Car Price",
-                     "Car Life",
-                     "Insurance",
-                     "Tire/Breaks Life"),
+            Name = c("car_price",
+                     "car_life",
+                     "insurance",
+                     "tire_breaks",
+                     "tire_cost",
+                     "breaks_cost",
+                     "oil_change",
+                     "oil_cost",
+                     "other_maintenance",
+                     "other",
+                     "gas",
+                     "mpg",
+                     "labor",
+                     "miles_year",
+                     "avg_speed",
+                     "time_without_trip",
+                     "test"
+        ),
             Value = as.character(c(paste(input$car_price, collapse =" "),
                                    input$car_life,
                                    input$insurance,
-                                   input$tires_breaks)),
+                                   input$tires_breaks,
+                                   input$tire_cost,
+                                   input$breaks_cost,
+                                   input$oil_change,
+                                   input$oil_cost,
+                                   input$other_maintenance,
+                                   input$other,
+                                   input$gas,
+                                   input$mpg,
+                                   input$labor,
+                                   input$miles_year,
+                                   input$avg_speed,
+                                   input$time_without_trip,
+                                   (2*(input$car_price[2]-input$car_price[1])/input$car_life +
+                                       input$insurance/input$miles_year +
+                                       (input$tire_cost+input$breaks_cost)/input$tires_breaks +
+                                        input$oil_cost/input$oil_change +
+                                       input$other/input$other_maintenance +
+                                       input$gas/input$mpg +
+                                       input$labor/input$avg_speed) / (1-(input$time_without_trip/100))
+                                       
+                                   )),
             stringsAsFactors = FALSE)
         
     })
@@ -67,12 +107,12 @@ shinyServer(function(input, output) {
     })
     
     output$contribution <- renderInfoBox({
-        total_contribution <- round(sum(df_overview[,c(7,9,10)]))
-        infoBox('Contribution', paste("$",prettyNum(total_contribution,big.mark=",")), icon = icon("hand-holding-usd"),color='olive')
+        total_contribution <- round(sum(df_overview$amount_mta)+sum(df_overview$amount_tolls)+sum(df_overview$amount_improvement))
+        infoBox('Tax Contribution', paste("$",prettyNum(total_contribution,big.mark=",")), icon = icon("hand-holding-usd"),color='olive')
     })
     
     output$distance <- renderInfoBox({
-        total_distance <- round(df_overview$distance/df_overview$trips)
+        total_distance <- round(df_overview$distance/df_overview$trips,2)
         infoBox('Distance (Avg)', paste(prettyNum(total_distance,big.mark=","),"mi"), color='navy')
     })
     
@@ -87,7 +127,7 @@ shinyServer(function(input, output) {
     })
     
     output$speed <- renderInfoBox({
-        total_speed <- round((df_overview$distance/df_overview$trips)/((df_overview$duration/df_overview$trips)/60))
+        total_speed <- round((df_overview$distance/df_overview$trips)/((df_overview$duration/df_overview$trips)/60),2)
         infoBox('Speed', paste(total_speed,"mph"), icon = icon("tachometer-alt"),color='yellow')
     })
     

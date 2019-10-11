@@ -10,15 +10,11 @@ shinyUI(dashboardPage(
         sidebarUserPanel("NYC Yellow Taxis"),
         sidebarMenu(
             menuItem("Overview", tabName = "overview", icon = icon("globe")),
-            menuItem(
-                "Model",
-                tabName = "model",
-                icon = icon("project-diagram")
-            ),
+            menuItem("Model", tabName = "model",icon = icon("project-diagram")),
             menuItem("Data", tabName = "data", icon = icon("database")),
-            selectizeInput(inputId = "selected",
-                           "Select Item to Display",
-                           choice)
+            menuItem("Assumptions", tabName = "assumptions",icon = icon("project-diagram")),
+            menuItem("About", tabName = "about",icon = icon("project-diagram")),
+            selectizeInput(inputId = "selected","Select Item to Display",choice)
         )
     ),
     dashboardBody(tabItems(
@@ -27,20 +23,23 @@ shinyUI(dashboardPage(
             titlePanel(tags$h4("Estimated 2019")),
             fluidRow(
                 infoBoxOutput("sales"),
+                infoBoxOutput("nthValue"),
                 infoBoxOutput("passengers"),
                 infoBoxOutput("contribution"),
                 infoBoxOutput("trips"),
                 infoBoxOutput("distance"),
                 infoBoxOutput("speed"),
                 infoBoxOutput("duration")
+                
             ),
             
             #                         infoBoxOutput("avgBox")),
             
             # gvisGeoChart
-            fluidRow(box(htmlOutput("map", height = 300)),
+            fluidRow(
+                     box(plotOutput("voladora")),
                      # gvisHistoGram
-                     box(htmlOutput("hist", height = 300)))
+                     box())
         ),
         tabItem(
             tabName = "model",
@@ -65,9 +64,10 @@ shinyUI(dashboardPage(
                         "Car Life:",
                         min = 100000,
                         max = 500000,
-                        value = 250000,
+                        value = 200000,
                         post = " mi",
-                        step = 5000
+                        step = 5000,
+                        animate = TRUE
                     )
                 ),
                 column(
@@ -77,9 +77,9 @@ shinyUI(dashboardPage(
                         "Insurance (year):",
                         pre = "$",
                         sep = ",",
-                        min = 800,
-                        max = 3000,
-                        value = 1500
+                        min = 2000,
+                        max = 5000,
+                        value = 3500
                     )
                 )
             ),
@@ -101,8 +101,8 @@ shinyUI(dashboardPage(
                         animate = TRUE
                     ),
                     
-                    textInput("tire_cost", "Tire Set ($)", "500"),
-                    textInput("breaks_cost", "Breaks ($)", "500")
+                    numericInput("tire_cost", "Tire Set ($)", "500"),
+                    numericInput("breaks_cost", "Breaks ($)", "500")
                     
                     
                     
@@ -125,7 +125,7 @@ shinyUI(dashboardPage(
                         #pre = "$",
                         sep = ","
                     ),
-                    textInput("oil_cost", "Oil Change ($)", "50")
+                    numericInput("oil_cost", "Oil Change ($)", "50")
                     
                 ),
                 column(
@@ -136,7 +136,7 @@ shinyUI(dashboardPage(
                     
                     # Input: Custom currency format for with basic animation ----
                     sliderInput(
-                        "other",
+                        "other_maintenance",
                         "Other Maintenance:",
                         min = 2000,
                         max = 50000,
@@ -147,7 +147,7 @@ shinyUI(dashboardPage(
                         sep = ","
                     ),
                     
-                    textInput("other", "Other ($)", "150")
+                    numericInput("other", "Other ($)", "150")
                 )
                 #),
                 
@@ -173,7 +173,7 @@ shinyUI(dashboardPage(
                                 "Combined mpg:",
                                 min = 10,
                                 max = 60,
-                                value = 25,
+                                value = 20,
                                 step = .5,
                                 post = " mpg",
                                 #pre = "$",
@@ -188,7 +188,7 @@ shinyUI(dashboardPage(
                          "Labor:",
                          min = 10,
                          max = 40,
-                         value = 15,
+                         value = 20,
                          step = 1,
                          post = " /hr",
                          pre = "$",
@@ -196,9 +196,9 @@ shinyUI(dashboardPage(
                      )),
                      column(4, 
                             tags$h5("General Settings"),
-                            textInput("miles_year", "Avg Miles per Year:", "40000"),
-                            textInput("avg_speed", "Avg Speed (mph)", "36"),
-                            textInput("time_without_trip", "% Time without trip:", "10")
+                            numericInput("miles_year", "Avg Miles per Year:", "40000"),
+                            numericInput("avg_speed", "Avg Speed (mph)", "36"),
+                            numericInput("time_without_trip", "% Time without trip:", "10")
                             
                             
                             
@@ -208,10 +208,19 @@ shinyUI(dashboardPage(
             
             fluidRow(tableOutput("values"))
         ),
+        
         tabItem(tabName = "data",
                 # datatable
                 fluidRow(box(
                     DT::dataTableOutput("table"), width = 12
-                )))
+                ))),
+        tabItem(tabName = "assumptions",
+                # datatable
+                fluidRow("prueba")
+    ),
+    tabItem(tabName = "about",
+            # datatable
+            fluidRow("prueba")
+    )
     ))
 ))

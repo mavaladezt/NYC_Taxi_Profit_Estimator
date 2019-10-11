@@ -69,24 +69,39 @@ fwrite(df_overview,"df_overview.csv")
 
 #==============================================================================
 
-#DATASET: Yellow Taxi Trip Records January-June 2019
-#PROFITABILITY OF Yellow Taxi Trip Records
+tot_trips=sum(df_overview$trips)
 
-# Overview: How big is the yellow taxi system (estimated 2019).
-#   passengers / trips / income
+df_overview %>%
+    select(amount_fare,amount_extra,amount_mta,amount_tolls,amount_improvement,amount_tip,amount_total) %>% 
+    rename(Fare=amount_fare,Extra=amount_extra,MTA=amount_mta,Tolls=amount_tolls,Improv=amount_improvement,Tip=amount_tip,Total=amount_total) %>% 
+    summarize_all(sum) -> x
 
-# How profitable is the yellow taxi system?
+columns=colnames(x)
+x %>% transpose() %>% cbind(columns) -> wat
+wat$V1=wat$V1/tot_trips
+colnames(wat)=c('Amount','desc')
 
-# Most/less profitable routes
-# Range of distances that are more profitable.
+wat$desc <- as.character(wat$desc)
+wat$id <- seq_along(wat$Amount)
+wat$type <- ifelse(wat$Amount>0,"in","out")
+wat$type[wat$desc=='Total']='net'
+wat$end <- cumsum(wat$Amount)
+wat$end <- c(head(wat$end,-1),0)
+wat$start <- c(0,head(wat$end,-1))
+wat <- wat[,c(4,3,6,1,5,2)]
+wat$type <- as.factor(wat$type)
+xlabels=as.character(wat$desc)
 
-# Avg speed by time of the day
+voladora <- ggplot(wat,aes(x=desc,fill=type)) +
+    geom_rect(aes(xmin=id-.45,xmax=id+.45,ymin=end,ymax=start)) +
+    scale_x_discrete(labels=xlabels) +
+    ggtitle("Average NYC Yellow Taxi Trip") +
+    theme(plot.title = element_text(hjust=0.5)) 
+voladora
 
-# Sensitivity analysis / Equilibrum point
+str(voladora)
 
-# Simulation??
-
-# Is it worth it to invest in a medallion? Equilibrum point of medallion prices?
+#ggplot(data = wat,aes(x =wat$Desc)) + geom_bar(aes(fill =type))
 
 #==============================================================================
 

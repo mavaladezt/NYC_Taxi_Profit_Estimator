@@ -5,8 +5,10 @@
 #library(lubridate)
 #https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
-#setwd("/Users/mavt/Documents/Temp/")
-#getwd()
+
+
+setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/taxis/")
+getwd()
 
 
 #file_in = "yellow_tripdata_2019-06.csv"
@@ -34,7 +36,7 @@
 #file_out = "yellow_tripdata_2019-01_out.csv"
 #df02=df
 
-df01=df
+#df01=df
 
 
 
@@ -63,11 +65,12 @@ df$tpep_pickup_datetime = NULL
 df$trips=1
 
 df=df[df$duration>0,]
+df=df[df$trip_distance>0,]
 
-df = df[df$year==2019,]
+#df = df[df$year==2019,]
 #nrow(df)
-df = df[df$month<7,]
-nrow(df)
+#df = df[df$month<7,]
+#nrow(df)
 df = df[df$fare_amount>0,]
 nrow(df)
 
@@ -86,13 +89,14 @@ df %>%
     dplyr::rename(D_borough=Borough,D_Zone=Zone) %>%
     select(-LocationID) -> df
 
-fwrite(df,file_out)
+#fwrite(df,file_out)
 
 df %>% group_by(year,month,O_borough,O_Zone,D_borough,D_Zone,payment_type,wday,range_hrs) %>%
     summarize(passengers=sum(passenger_count),distance=sum(trip_distance),amount_fare=sum(fare_amount),amount_extra=sum(extra),amount_mta=sum(mta_tax),amount_tip=sum(tip_amount),amount_tolls=sum(tolls_amount),amount_improvement=sum(improvement_surcharge),amount_total=sum(total_amount),duration=sum(duration),trips=sum(trips)) -> df
 
 
 df=rbind(df01,df02,df03,df04,df05,df06)
+fwrite(df,"trips_2019_01_to_06.csv")
 
 #unique(df$month)
 
@@ -101,7 +105,7 @@ df=rbind(df01,df02,df03,df04,df05,df06)
 #nrow(df[df$year==2019,])
 #nrow(df)
 
-fwrite(df,"trips_2019_01_to_06.csv")
+
 
 #df_small=df[sample(1:nrow(df),size = 10000,replace=F),]
 
