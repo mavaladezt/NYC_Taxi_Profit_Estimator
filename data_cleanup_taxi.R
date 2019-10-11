@@ -66,6 +66,7 @@ df$trips=1
 
 df=df[df$duration>0,]
 df=df[df$trip_distance>0,]
+df=df[df$duration<150,]
 
 #df = df[df$year==2019,]
 #nrow(df)

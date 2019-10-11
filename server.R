@@ -21,6 +21,46 @@ shinyServer(function(input, output) {
             theme(plot.title = element_text(hjust=0.5))
     )
     
+    
+#    output$demand_heatmap <- renderPlot(
+#        
+#        df_overview[complete.cases(df_overview),] %>%
+#            select(wday,range_hrs,trips) %>% 
+#            mutate(trips=(trips/365)) %>% 
+#            ggplot(aes(x = wday, y = range_hrs)) +
+#            geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
+#        
+#    )
+#    
+#    output$speed_heatmap <- renderPlot(
+#        
+#        df_overview[complete.cases(df_overview),] %>%
+#            select(wday,range_hrs,distance,duration) %>% 
+#            mutate(speed=(distance/(duration/60))) %>% 
+#            select(-distance,-duration) %>%     
+#            ggplot(aes(x = wday, y = range_hrs)) +
+#            geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
+#    
+#    )    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     # Reactive expression to create data frame of all input values ----
     sliderValues <- reactive({
         
@@ -90,10 +130,12 @@ shinyServer(function(input, output) {
                                                 FALSE]))
     
     output$table <- DT::renderDataTable({
-        datatable(state_stat, rownames = FALSE) %>%
-            formatStyle(input$selected,
-                        background = "skyblue",
-                        fontWeight = 'bold')
+        datatable(df_data, selection='single',rownames = FALSE,filter="top",options = list(sDom  = '<"top">lrt<"bottom">ip')) %>%
+            formatCurrency(columns=c('Fare','Extra',"MTA","Tip","Tolls","Improv.","Total")) %>% 
+            formatRound(columns = c("Distance","Avg.Mins","Trips"),digits = 0)  
+            #formatStyle(input$selected,
+            #            background = "skyblue",
+            #            fontWeight = 'bold')
         # Highlight selected column using formatStyle
     })
     output$passengers <- renderInfoBox({

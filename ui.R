@@ -11,9 +11,10 @@ shinyUI(dashboardPage(
         sidebarMenu(
             menuItem("Overview", tabName = "overview", icon = icon("globe")),
             menuItem("Model", tabName = "model",icon = icon("project-diagram")),
+            menuItem("Traffic/Demand Heatmaps", tabName = "heatmaps",icon = icon("stream")),
             menuItem("Data", tabName = "data", icon = icon("database")),
-            menuItem("Assumptions", tabName = "assumptions",icon = icon("project-diagram")),
-            menuItem("About", tabName = "about",icon = icon("project-diagram")),
+            menuItem("Assumptions", tabName = "assumptions",icon = icon("list")),
+            menuItem("About", tabName = "about",icon = icon("address-card")),
             selectizeInput(inputId = "selected","Select Item to Display",choice)
         )
     ),
@@ -208,19 +209,127 @@ shinyUI(dashboardPage(
             
             fluidRow(tableOutput("values"))
         ),
+
         
+        
+        
+        
+        
+        
+        
+        
+                
         tabItem(tabName = "data",
                 # datatable
                 fluidRow(box(
                     DT::dataTableOutput("table"), width = 12
                 ))),
+        
+        
+        
         tabItem(tabName = "assumptions",
                 # datatable
-                fluidRow("prueba")
+                fluidRow(column(6,
+                                
+                                HTML(
+                                    "
+                                    
+<h2>Data Assumptions</h1>
+<h4>&nbsp;</h4>
+<ul>
+<li>
+<h4>Working with 2019 data (Jan-Jun).</h4>
+</li>
+<li>
+<h4>Filtered transactions that had duration of more than 2 hrs.</h4>
+</li>
+<li>
+<h4>Filtered trips with 'zero' fare.</h4>
+</li>
+<li>
+<h4>Filtered transactions that were not paid by Credit Card or Cash.</h4>
+</li>
+<li>
+<h4>If driver didn't captured number of passengers I assumed there was only 1 passenger.</h4>
+</li>
+</ul>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    "
+                                    
+                                    
+                                    
+                                )
+                                ),
+                         column(6,
+                                HTML(
+                                 
+                                    "
+                                    
+                                    
+                                    <h2>Model Assumptions</h1>
+<h4>&nbsp;</h4>
+<ul>
+<li>
+<h4>Profit is an estimation of total profit that 'stays' in the Taxi business. For example, tips paid, even though are kep by driver, they stay in the Taxi 'system'.</h4>
+</li>
+<li>
+<h4>Estimated profit excludes tolls, MTA&nbsp;and improvement fees since the Taxi company transfers its to the State or City.</h4>
+</li>
+<li>
+<h4>There is a replacement of the net car cost (purchase price - estimated resale value) so that the Taxi company is able to renew cars.</h4>
+</li>
+</ul>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    "
+                                    
+                                       
+                                )
+                                )
+                         )
     ),
     tabItem(tabName = "about",
             # datatable
-            fluidRow("prueba")
+            fluidRow(column(4,
+                            
+                            
+                            "PHOTO"
+                            
+                            ),
+                     column(8,
+                            
+                            
+                            HTML("
+                                 
+                                 
+                                 <h1>Mario Valadez Trevino</h1>
+<h4>&nbsp;</h4>
+<h4>Mario Valadez Trevino is a NYC Data Science Fellow with a B.S. in Industrial Engineering with minor in Systems Engineering and an MBA.</h4>
+<h4>Mario has relevant experience in demand forecasting, production and transportation planning, warehouse management systems and supply chain network design optimization and simulation. Also with experience in the food industry as a business owner.</h4>
+<a href='https://www.linkedin.com/in/mavaladezt/'>Linked IN</a>                                 
+                                 
+                                 
+                                 
+                                 
+                                 
+                                 
+                                 
+                                 ")
+                            
+                     )
+                     )
     )
-    ))
+    )
+    
+    
+    
+    
+    )
 ))

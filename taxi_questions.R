@@ -6,7 +6,7 @@ library(ggplot2)
 library(ggthemes)
 
 #==============================================================================
-#FILE LOADING ####
+#DF_OVERVIEW ####
 setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/taxis/")
 getwd()
 
@@ -107,6 +107,52 @@ str(voladora)
 
 
 
+#==============================================================================
+#DF_DATA ####
+setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/taxis/")
+getwd()
+
+#df <- fread("trips_2019_01_to_06.csv")
+
+multiplier=365/181
+multiplier=1/181
+
+df <- read_csv("trips_2019_01_to_06.csv", 
+               col_types = cols(year = col_skip(),
+                                month = col_skip(),
+                                payment_type= col_skip()))
+
+df %>% 
+    group_by(O_borough,O_Zone,D_borough,D_Zone) %>% 
+    summarize(passengers=sum(passengers),distance=sum(distance),amount_fare=sum(amount_fare),amount_extra=sum(amount_extra),amount_mta=sum(amount_mta),amount_tip=sum(amount_tip),amount_tolls=sum(amount_tolls),amount_improvement=sum(amount_improvement),amount_total=sum(amount_total),duration=sum(duration),trips=sum(trips)) %>% 
+    mutate(passengers=(passengers*multiplier),distance=(distance*multiplier),amount_fare=(amount_fare*multiplier),amount_extra=(amount_extra*multiplier),amount_mta=(amount_mta*multiplier),amount_tip=(amount_tip*multiplier),amount_tolls=(amount_tolls*multiplier),amount_improvement=(amount_improvement*multiplier),amount_total=(amount_total*multiplier),duration=(duration*multiplier),trips=(trips*multiplier)) %>% 
+    mutate(passengers=(passengers/trips),distance=(distance/trips),amount_fare=(amount_fare/trips),amount_extra=(amount_extra/trips),amount_mta=(amount_mta/trips),amount_tip=(amount_tip/trips),amount_tolls=(amount_tolls/trips),amount_improvement=(amount_improvement/trips),amount_total=(amount_total/trips),duration=(duration/trips)) %>% 
+    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") %>% 
+    rename('From Borough'=O_borough,Zone=O_Zone,'To Borough'=D_borough,"To Zone"=D_Zone,"Daily Passengers"=passengers,Distance=distance,Fare=amount_fare,Extra=amount_extra,MTA=amount_mta,Tip=amount_tip,Tolls=amount_tolls,Improv.=amount_improvement,Total=amount_total,"Avg.Mins"=duration,Trips=trips) %>% 
+    select(-"Daily Passengers") %>% 
+    arrange(-Trips) ->
+    df_data
+
+object_size(df_data)
+
+fwrite(df_data,"df_data.csv")
 
 
 
+#==============================================================================
+# HEATMAPS ####
+df_overview[complete.cases(df_overview),] %>%
+    select(wday,range_hrs,trips) %>% 
+    mutate(trips=(trips/365)) %>% 
+    ggplot(aes(x = wday, y = range_hrs)) +
+    geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
+
+
+
+
+df_overview[complete.cases(df_overview),] %>%
+    select(wday,range_hrs,distance,duration) %>% 
+    mutate(speed=(distance/(duration/60))) %>% 
+    select(-distance,-duration) %>%     
+    ggplot(aes(x = wday, y = range_hrs)) +
+    geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
