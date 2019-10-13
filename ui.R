@@ -2,6 +2,7 @@
 
 
 
+
 #   AGREGAR GRAFICAS POR DAY OF THE WEEK, BOROUGH, HEATMAP WITH DAY OF THE WEEK AND RANGE_HRS
 
 shinyUI(dashboardPage(
@@ -10,12 +11,19 @@ shinyUI(dashboardPage(
         sidebarUserPanel("NYC Yellow Taxis"),
         sidebarMenu(
             menuItem("Overview", tabName = "overview", icon = icon("globe")),
-            menuItem("Model", tabName = "model",icon = icon("project-diagram")),
-            menuItem("Traffic/Demand Heatmaps", tabName = "heatmaps",icon = icon("stream")),
+            menuItem(
+                "Model",
+                tabName = "model",
+                icon = icon("project-diagram")
+            ),
+            menuItem(
+                "Traffic/Demand Heatmaps",
+                tabName = "heatmaps",
+                icon = icon("stream")
+            ),
             menuItem("Data", tabName = "data", icon = icon("database")),
-            menuItem("Assumptions", tabName = "assumptions",icon = icon("list")),
-            menuItem("About", tabName = "about",icon = icon("address-card")),
-            selectizeInput(inputId = "selected","Select Item to Display",choice)
+            menuItem("Assumptions", tabName = "assumptions", icon = icon("list")),
+            menuItem("About", tabName = "about", icon = icon("address-card"))
         )
     ),
     dashboardBody(tabItems(
@@ -24,7 +32,7 @@ shinyUI(dashboardPage(
             titlePanel(tags$h4("Estimated 2019")),
             fluidRow(
                 infoBoxOutput("sales"),
-                infoBoxOutput("nthValue"),
+                infoBoxOutput("profit"),
                 infoBoxOutput("passengers"),
                 infoBoxOutput("contribution"),
                 infoBoxOutput("trips"),
@@ -37,8 +45,7 @@ shinyUI(dashboardPage(
             #                         infoBoxOutput("avgBox")),
             
             # gvisGeoChart
-            fluidRow(
-                     box(plotOutput("voladora")),
+            fluidRow(box(plotOutput("voladora")),
                      # gvisHistoGram
                      box())
         ),
@@ -80,7 +87,8 @@ shinyUI(dashboardPage(
                         sep = ",",
                         min = 2000,
                         max = 5000,
-                        value = 3500
+                        value = 3500,
+                        animate = TRUE
                     )
                 )
             ),
@@ -124,7 +132,8 @@ shinyUI(dashboardPage(
                         step = 500,
                         post = " mi",
                         #pre = "$",
-                        sep = ","
+                        sep = ",",
+                        animate = TRUE
                     ),
                     numericInput("oil_cost", "Oil Change ($)", "50")
                     
@@ -145,7 +154,8 @@ shinyUI(dashboardPage(
                         step = 500,
                         post = " mi",
                         #pre = "$",
-                        sep = ","
+                        sep = ",",
+                        animate = TRUE
                     ),
                     
                     numericInput("other", "Other ($)", "150")
@@ -157,59 +167,69 @@ shinyUI(dashboardPage(
                 
             ),
             titlePanel(tags$h4("VARIABLE COSTS")),
-            fluidRow(column(4, 
-                            
-                            sliderInput(
-                                "gas",
-                                "Gas Price:",
-                                min = 2,
-                                max = 5,
-                                value = 3.5,
-                                step = .10,
-                                #post = " mi",
-                                pre = "$",
-                                sep = ","
-                            ),sliderInput(
-                                "mpg",
-                                "Combined mpg:",
-                                min = 10,
-                                max = 60,
-                                value = 20,
-                                step = .5,
-                                post = " mpg",
-                                #pre = "$",
-                                sep = ","
-                            )
-                            
-                            
-                            
-                            ),
-                     column(4, sliderInput(
-                         "labor",
-                         "Labor:",
-                         min = 10,
-                         max = 40,
-                         value = 20,
-                         step = 1,
-                         post = " /hr",
-                         pre = "$",
-                         sep = ","
-                     )),
-                     column(4, 
-                            tags$h5("General Settings"),
-                            numericInput("miles_year", "Avg Miles per Year:", "40000"),
-                            numericInput("avg_speed", "Avg Speed (mph)", "36"),
-                            numericInput("time_without_trip", "% Time without trip:", "10")
-                            
-                            
-                            
-                            )),
+            fluidRow(
+                column(
+                    4,
+                    
+                    sliderInput(
+                        "gas",
+                        "Gas Price:",
+                        min = 2,
+                        max = 5,
+                        value = 3.5,
+                        step = .10,
+                        #post = " mi",
+                        pre = "$",
+                        sep = ",",
+                        animate = TRUE
+                    ),
+                    sliderInput(
+                        "mpg",
+                        "Combined mpg:",
+                        min = 10,
+                        max = 60,
+                        value = 20,
+                        step = .5,
+                        post = " mpg",
+                        #pre = "$",
+                        sep = ",",
+                        animate = TRUE
+                    )
+                    
+                    
+                    
+                ),
+                column(
+                    4,
+                    sliderInput(
+                        "labor",
+                        "Labor:",
+                        min = 10,
+                        max = 40,
+                        value = 20,
+                        step = 1,
+                        post = " /hr",
+                        pre = "$",
+                        sep = ",",
+                        animate = TRUE
+                    )
+                ),
+                column(
+                    4,
+                    tags$h5("General Settings"),
+                    numericInput("miles_year", "Avg Miles per Year:", "70000"),
+                    numericInput("avg_speed", "Avg Speed (mph)", "12.56"),
+                    numericInput("time_without_trip", "% Time without trip:", "39")
+                    
+                    
+                    
+                )
+            ),
             
             
             
             fluidRow(tableOutput("values"))
         ),
-
         
         
         
@@ -218,7 +238,8 @@ shinyUI(dashboardPage(
         
         
         
-                
+        
+        
         tabItem(tabName = "data",
                 # datatable
                 fluidRow(box(
@@ -227,13 +248,15 @@ shinyUI(dashboardPage(
         
         
         
+        
         tabItem(tabName = "assumptions",
                 # datatable
-                fluidRow(column(6,
-                                
-                                HTML(
-                                    "
-                                    
+                fluidRow(column(
+                    6,
+                    
+                    HTML(
+                        "
+
 <h2>Data Assumptions</h1>
 <h4>&nbsp;</h4>
 <ul>
@@ -253,23 +276,23 @@ shinyUI(dashboardPage(
 <h4>If driver didn't captured number of passengers I assumed there was only 1 passenger.</h4>
 </li>
 </ul>
-                                    
-                                    
-                                    
-                                    
-                                    
+
+
+
+
+
                                     "
-                                    
-                                    
-                                    
-                                )
-                                ),
-                         column(6,
-                                HTML(
-                                 
-                                    "
-                                    
-                                    
+                        
+                        
+                        
+                    )
+                ),
+                column(
+                    6,
+                    HTML(
+                        "
+
+
                                     <h2>Model Assumptions</h1>
 <h4>&nbsp;</h4>
 <ul>
@@ -283,53 +306,52 @@ shinyUI(dashboardPage(
 <h4>There is a replacement of the net car cost (purchase price - estimated resale value) so that the Taxi company is able to renew cars.</h4>
 </li>
 </ul>
-                                    
-                                    
-                                    
-                                    
-                                    
+
+
+
+
+
                                     "
-                                    
-                                       
-                                )
-                                )
-                         )
-    ),
-    tabItem(tabName = "about",
-            # datatable
-            fluidRow(column(4,
-                            
-                            
-                            "PHOTO"
-                            
-                            ),
-                     column(8,
-                            
-                            
-                            HTML("
-                                 
-                                 
+                        
+                        
+                    )
+                ))),
+        tabItem(tabName = "about",
+                # datatable
+                fluidRow(column(4,
+                                
+                                
+                                "PHOTO"),
+                         column(
+                             8,
+                             
+                             
+                             HTML(
+                                 "
+
+
                                  <h1>Mario Valadez Trevino</h1>
 <h4>&nbsp;</h4>
 <h4>Mario Valadez Trevino is a NYC Data Science Fellow with a B.S. in Industrial Engineering with minor in Systems Engineering and an MBA.</h4>
 <h4>Mario has relevant experience in demand forecasting, production and transportation planning, warehouse management systems and supply chain network design optimization and simulation. Also with experience in the food industry as a business owner.</h4>
-<a href='https://www.linkedin.com/in/mavaladezt/'>Linked IN</a>                                 
-                                 
-                                 
-                                 
-                                 
-                                 
-                                 
-                                 
-                                 ")
-                            
-                     )
-                     )
-    )
-    )
-    
-    
-    
-    
-    )
+<a href='https://www.linkedin.com/in/mavaladezt/'>Linked IN</a>
+
+
+
+
+
+
+
+                                 "
+                             )
+                             
+                         )))
+        
+        ,
+        tabItem(tabName = "heatmaps",
+                # datatable
+                fluidRow(box(plotOutput("demand_heatmap")),
+                         box(plotOutput("speed_heatmap"))
+                         ))
+    ))
 ))

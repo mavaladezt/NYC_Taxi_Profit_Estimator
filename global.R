@@ -15,17 +15,15 @@ df_data <- fread("df_data.csv")
 #state_stat <-
 #    data.frame(state.name = rownames(state.x77), state.x77)
 # remove row names
-rownames(df_data) <- NULL
+#rownames(df_data) <- NULL
 # create variable with colnames as choice
-choice <- colnames(df_data)[-1]
+#choice <- colnames(df_data)[-1]
 
 
-
-
-state_stat <-
-    data.frame(state.name = rownames(state.x77), state.x77)
+#state_stat <-
+#    data.frame(state.name = rownames(state.x77), state.x77)
 # remove row names
-rownames(state_stat) <- NULL
+#rownames(state_stat) <- NULL
 # create variable with colnames as choice
 #choice <- colnames(state_stat)[-1]
 

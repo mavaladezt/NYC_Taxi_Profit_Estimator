@@ -156,3 +156,38 @@ df_overview[complete.cases(df_overview),] %>%
     select(-distance,-duration) %>%     
     ggplot(aes(x = wday, y = range_hrs)) +
     geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
+
+
+
+
+
+#==============================================================================
+#FILE PROCESSING ####
+
+#General Dataframe
+df[complete.cases(df),c(1:6,8,16,17)] %>% 
+    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") -> temp
+
+temp[,c(1,3,5:9)] %>% 
+    group_by(O_borough,D_borough,wday,range_hrs) %>% 
+    summarize(distance=sum(distance),duration=sum(duration),trips=sum(trips)) ->
+    df_heatmaps
+
+object_size(df_heatmaps)
+nrow(df_heatmaps)
+fwrite(df_heatmaps,"df_heatmaps.csv")
+
+#==============================================================================
+#FILE PROCESSING ####
+
+#df[complete.cases(df),c(1:4,7:17)] %>% 
+#    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") %>%
+#    group_by(O_borough,O_Zone,D_borough,D_Zone) %>% 
+#    summarize(distance=sum(distance),amount_fare=sum(amount_fare),amount_extra=sum(amount_extra),amount_tip=sum(amount_tip),duration=sum(duration),trips=sum(trips)) ->
+#    df_routes
+
+#object_size(df_routes)
+#nrow(df_routes)
+#fwrite(df_routes,"df_routes.csv")
+
+#==============================================================================

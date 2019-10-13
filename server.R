@@ -1,19 +1,34 @@
-fib <- function(n) {n*2.01}
+fib <- function(n) {n}
+
+
+
+
+
+
 
 
 shinyServer(function(input, output) {
     
     currentFib <- function() {
-        fib(as.numeric(input$car_life))
+        fib(as.numeric(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)-
+            (((2*(input$car_price[2]-input$car_price[1])/input$car_life +
+                            input$insurance/input$miles_year +
+                            (input$tire_cost+input$breaks_cost)/input$tires_breaks +
+                            input$oil_cost/input$oil_change +
+                            input$other/input$other_maintenance +
+                            input$gas/input$mpg +
+                            input$labor/input$avg_speed) / (1-(input$time_without_trip/100)))*
+                           (sum(df_overview$distance)/sum(df_overview$trips)))*sum(df_overview$trips)
+                           
+            
+                       ))
     }
     
-    output$nthValue <- renderInfoBox({ 
-        infoBox('nthValue', prettyNum(currentFib(),big.mark=","), icon = icon("chart-line"),color='blue')})
+    output$profit <- renderInfoBox({ 
+        infoBox('Profit', prettyNum(currentFib(),big.mark=","), icon = icon("chart-line"),color='blue')})
     
     
     output$voladora <- renderPlot(
-
-        
         ggplot(wat,aes(x=desc,fill=type)) +
             geom_rect(aes(xmin=id-.45,xmax=id+.45,ymin=end,ymax=start)) +
             scale_x_discrete(labels=xlabels) +
@@ -21,27 +36,27 @@ shinyServer(function(input, output) {
             theme(plot.title = element_text(hjust=0.5))
     )
     
-    
-#    output$demand_heatmap <- renderPlot(
-#        
-#        df_overview[complete.cases(df_overview),] %>%
-#            select(wday,range_hrs,trips) %>% 
-#            mutate(trips=(trips/365)) %>% 
-#            ggplot(aes(x = wday, y = range_hrs)) +
-#            geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
-#        
-#    )
-#    
-#    output$speed_heatmap <- renderPlot(
-#        
-#        df_overview[complete.cases(df_overview),] %>%
-#            select(wday,range_hrs,distance,duration) %>% 
-#            mutate(speed=(distance/(duration/60))) %>% 
-#            select(-distance,-duration) %>%     
-#            ggplot(aes(x = wday, y = range_hrs)) +
-#            geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
-#    
-#    )    
+        output$demand_heatmap <- renderPlot(
+            
+            df_overview[complete.cases(df_overview),] %>%
+                select(wday,range_hrs,trips) %>% 
+                mutate(trips=(trips/365)) %>% 
+                ggplot(aes(x = wday, y = range_hrs)) +
+                geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
+            
+        )
+        
+        output$speed_heatmap <- renderPlot(
+            
+            df_overview[complete.cases(df_overview),] %>%
+                select(wday,range_hrs,distance,duration) %>% 
+                mutate(speed=(distance/(duration/60))) %>% 
+                select(-distance,-duration) %>%     
+                ggplot(aes(x = wday, y = range_hrs)) +
+                geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
+        
+        )        
+
     
     
     
@@ -125,9 +140,9 @@ shinyServer(function(input, output) {
     
     
     # show histogram using googleVis
-    output$hist <-
-        renderGvis(gvisHistogram(state_stat[, input$selected, drop =
-                                                FALSE]))
+#    output$hist <-
+#        renderGvis(gvisHistogram(state_stat[, input$selected, drop =
+#                                                FALSE]))
     
     output$table <- DT::renderDataTable({
         datatable(df_data, selection='single',rownames = FALSE,filter="top",options = list(sDom  = '<"top">lrt<"bottom">ip')) %>%
@@ -145,16 +160,16 @@ shinyServer(function(input, output) {
     
     output$sales <- renderInfoBox({
         total_sales <- round(sum(df_overview$amount_total))
-        infoBox('Sales', paste("$",prettyNum(total_sales,big.mark = ",")), icon = icon("money-bill-alt"),color='green')
+        infoBox('Revenue', paste("$",prettyNum(total_sales,big.mark = ",")), icon = icon("money-bill-alt"),color='green')
     })
     
     output$contribution <- renderInfoBox({
         total_contribution <- round(sum(df_overview$amount_mta)+sum(df_overview$amount_tolls)+sum(df_overview$amount_improvement))
-        infoBox('Tax Contribution', paste("$",prettyNum(total_contribution,big.mark=",")), icon = icon("hand-holding-usd"),color='olive')
+        infoBox('Tax: Toll/MTA/Improv.', paste("$",prettyNum(total_contribution,big.mark=",")), icon = icon("hand-holding-usd"),color='olive')
     })
     
     output$distance <- renderInfoBox({
-        total_distance <- round(df_overview$distance/df_overview$trips,2)
+        total_distance <- round(sum(df_overview$distance)/sum(df_overview$trips),2)
         infoBox('Distance (Avg)', paste(prettyNum(total_distance,big.mark=","),"mi"), color='navy')
     })
     
@@ -164,14 +179,20 @@ shinyServer(function(input, output) {
     })
     
     output$duration <- renderInfoBox({
-        total_duration <- round(df_overview$duration/df_overview$trips)
+        total_duration <- round(sum(df_overview$duration)/sum(df_overview$trips))
         infoBox('Duration (Avg)', paste(total_duration,"mins"), icon = icon("hourglass-start"),color='light-blue')
     })
     
     output$speed <- renderInfoBox({
-        total_speed <- round((df_overview$distance/df_overview$trips)/((df_overview$duration/df_overview$trips)/60),2)
+        total_speed <- round((sum(df_overview$distance)/sum(df_overview$trips))/((sum(df_overview$duration)/sum(df_overview$trips))/60),2)
         infoBox('Speed', paste(total_speed,"mph"), icon = icon("tachometer-alt"),color='yellow')
     })
+    
+    
+
+    
+    
+    
     
 
     # output$avgBox <- renderInfoBox(infoBox(
