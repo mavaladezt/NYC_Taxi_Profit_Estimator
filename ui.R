@@ -17,7 +17,7 @@ shinyUI(dashboardPage(
                 icon = icon("project-diagram")
             ),
             menuItem(
-                "Traffic/Demand Heatmaps",
+                "Trips/Speed Heatmaps",
                 tabName = "heatmaps",
                 icon = icon("stream")
             ),
@@ -28,11 +28,16 @@ shinyUI(dashboardPage(
     ),
     dashboardBody(tabItems(
         tabItem(
+# Tab: Overview####
             tabName = "overview",
             titlePanel(tags$h4("Estimated 2019")),
-            fluidRow(
+    
+fluidRow(               
+
+                
                 infoBoxOutput("sales"),
                 infoBoxOutput("profit"),
+                infoBoxOutput("profit_perc"),
                 infoBoxOutput("passengers"),
                 infoBoxOutput("contribution"),
                 infoBoxOutput("trips"),
@@ -41,13 +46,26 @@ shinyUI(dashboardPage(
                 infoBoxOutput("duration")
                 
             ),
+fluidRow(box(
+    
+    HTML("
+         
+         <p>Revenue = Fare + Extra + MTA + Tolls + Improv + Tip</p>
+<p>Profit = Fare + Extra - Operating Costs (Model)</p>
+<p>Tax: Tolls + MTA + Improvement</p>
+         
+         
+         
+         "))
+    
+    
+    
+),
             
             #                         infoBoxOutput("avgBox")),
             
             # gvisGeoChart
-            fluidRow(box(plotOutput("voladora")),
-                     # gvisHistoGram
-                     box())
+            fluidRow(box(plotOutput("voladora")))
         ),
         tabItem(
             tabName = "model",
@@ -207,7 +225,7 @@ shinyUI(dashboardPage(
                         min = 10,
                         max = 40,
                         value = 20,
-                        step = 1,
+                        step = 0.5,
                         post = " /hr",
                         pre = "$",
                         sep = ",",
@@ -223,13 +241,15 @@ shinyUI(dashboardPage(
                     
                     
                     
-                )
-            ),
-            
-            
-            
-            fluidRow(tableOutput("values"))
-        ),
+                ),fluidRow(column(12,infoBoxOutput("profit2"),
+                           infoBoxOutput("profit_perc2")))
+            )
+ 
+# Calculations for Troubleshooting####                   
+#            ,
+#            fluidRow(tableOutput("values"))
+        
+),
         
         
         
@@ -239,7 +259,7 @@ shinyUI(dashboardPage(
         
         
         
-        
+
         tabItem(tabName = "data",
                 # datatable
                 fluidRow(box(
@@ -318,12 +338,8 @@ shinyUI(dashboardPage(
                 ))),
         tabItem(tabName = "about",
                 # datatable
-                fluidRow(column(4,
-                                
-                                
-                                "PHOTO"),
-                         column(
-                             8,
+                fluidRow(column(
+                             6,
                              
                              
                              HTML(
@@ -334,7 +350,9 @@ shinyUI(dashboardPage(
 <h4>&nbsp;</h4>
 <h4>Mario Valadez Trevino is a NYC Data Science Fellow with a B.S. in Industrial Engineering with minor in Systems Engineering and an MBA.</h4>
 <h4>Mario has relevant experience in demand forecasting, production and transportation planning, warehouse management systems and supply chain network design optimization and simulation. Also with experience in the food industry as a business owner.</h4>
-<a href='https://www.linkedin.com/in/mavaladezt/'>Linked IN</a>
+<a href='https://www.linkedin.com/in/mavaladezt/'>LinkedIN</a>
+<p></p>
+<a href='https://github.com/mavaladezt/'>github</a>
 
 
 
@@ -350,8 +368,20 @@ shinyUI(dashboardPage(
         ,
         tabItem(tabName = "heatmaps",
                 # datatable
-                fluidRow(box(plotOutput("demand_heatmap")),
-                         box(plotOutput("speed_heatmap"))
-                         ))
+                fluidRow(box(plotOutput("demand_heatmap2")),
+                         box(plotOutput("speed_heatmap2")
+                             
+                             
+                             
+                             )
+                         ),fluidRow(column(12,
+                                           
+                                           selectizeInput(inputId = "origin", 
+                                                          label = "Origin",
+                                                          choices = Origins,
+                                                          selected = "Manhattan -"),
+                                           selectizeInput(inputId = "dest", 
+                                                          label = "Destination",
+                                                          choices = NULL))),fluidRow(column(12,dataTableOutput("table2"))))
     ))
 ))

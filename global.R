@@ -1,36 +1,27 @@
 library(shinydashboard)
 library(DT)
-library(googleVis)
+#library(googleVis)
 library(data.table)
 library(ggthemes)
 library(dplyr)
 library(ggplot2)
+library(RSQLite)
 
 df_overview <- fread("df_overview.csv")
 
-
 df_data <- fread("df_data.csv")
 
-# convert matrix to dataframe
-#state_stat <-
-#    data.frame(state.name = rownames(state.x77), state.x77)
-# remove row names
-#rownames(df_data) <- NULL
-# create variable with colnames as choice
-#choice <- colnames(df_data)[-1]
+#df_heatmaps <- fread("df_heatmaps.csv")
 
+Origins<- c("Bronx -",
+            "Manhattan -",
+            "Queens -",
+            "Brooklyn -",
+            "EWR -",
+            "Staten Island -",
+            "Airport")
 
-#state_stat <-
-#    data.frame(state.name = rownames(state.x77), state.x77)
-# remove row names
-#rownames(state_stat) <- NULL
-# create variable with colnames as choice
-#choice <- colnames(state_stat)[-1]
-
-
-
-
-
+#https://wordhtml.com
 
 
 
@@ -40,7 +31,7 @@ df_overview %>%
     select(amount_fare,amount_extra,amount_mta,amount_tolls,amount_improvement,amount_tip,amount_total) %>% 
     rename(Fare=amount_fare,Extra=amount_extra,MTA=amount_mta,Tolls=amount_tolls,Improv=amount_improvement,Tip=amount_tip,Total=amount_total) %>% 
     summarize_all(sum) -> x
-#x["Net"]=sum(x)-sum(x$MTA)-sum(x$Tolls)-sum(x$Improv)
+
 
 columns=colnames(x)
 x %>% transpose() %>% cbind(columns) -> wat
@@ -58,6 +49,35 @@ wat$start <- c(0,head(wat$end,-1))
 wat <- wat[,c(4,3,6,1,5,2)]
 wat$type <- as.factor(wat$type)
 xlabels=as.character(wat$desc)
+
+
+#==========================================================
+
+
+
+dbConnector <- function(session, dbname) {
+    require(RSQLite)
+    ## setup connection to database
+    conn <- dbConnect(drv = SQLite(), 
+                      dbname = dbname)
+    ## disconnect database when session ends
+    session$onSessionEnded(function() {
+        dbDisconnect(conn)
+    })
+    ## return connection
+    conn
+}
+
+dbGetData <- function(conn, tblname, month, day) {
+    query <- paste("SELECT * FROM",
+                   tblname,
+                   "WHERE month =",
+                   as.character(month),
+                   "AND day =",
+                   as.character(day))
+    as.data.table(dbGetQuery(conn = conn,
+                             statement = query))
+}
 
 
 

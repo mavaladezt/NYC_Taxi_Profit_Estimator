@@ -138,7 +138,6 @@ object_size(df_data)
 fwrite(df_data,"df_data.csv")
 
 
-
 #==============================================================================
 # HEATMAPS ####
 df_overview[complete.cases(df_overview),] %>%
@@ -146,9 +145,6 @@ df_overview[complete.cases(df_overview),] %>%
     mutate(trips=(trips/365)) %>% 
     ggplot(aes(x = wday, y = range_hrs)) +
     geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
-
-
-
 
 df_overview[complete.cases(df_overview),] %>%
     select(wday,range_hrs,distance,duration) %>% 
@@ -158,18 +154,15 @@ df_overview[complete.cases(df_overview),] %>%
     geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
 
 
-
-
-
 #==============================================================================
 #FILE PROCESSING ####
 
 #General Dataframe
 df[complete.cases(df),c(1:6,8,16,17)] %>% 
-    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") -> temp
-
-temp[,c(1,3,5:9)] %>% 
-    group_by(O_borough,D_borough,wday,range_hrs) %>% 
+    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") %>%
+    mutate(Origen=paste0(O_borough," - ",O_Zone),Destino=paste0(D_borough," - ",D_Zone)) %>%
+    select(-O_borough,-O_Zone,-D_borough,-D_Zone) %>% 
+    group_by(Origen,Destino,wday,range_hrs) %>% 
     summarize(distance=sum(distance),duration=sum(duration),trips=sum(trips)) ->
     df_heatmaps
 
@@ -177,17 +170,34 @@ object_size(df_heatmaps)
 nrow(df_heatmaps)
 fwrite(df_heatmaps,"df_heatmaps.csv")
 
+
 #==============================================================================
-#FILE PROCESSING ####
 
-#df[complete.cases(df),c(1:4,7:17)] %>% 
-#    filter(O_borough!="Unknown" & D_borough!="Unknown" & O_Zone!="NV" & D_Zone!="NV") %>%
-#    group_by(O_borough,O_Zone,D_borough,D_Zone) %>% 
-#    summarize(distance=sum(distance),amount_fare=sum(amount_fare),amount_extra=sum(amount_extra),amount_tip=sum(amount_tip),duration=sum(duration),trips=sum(trips)) ->
-#    df_routes
+library(RSQLite)
+library(data.table)
 
-#object_size(df_routes)
-#nrow(df_routes)
-#fwrite(df_routes,"df_routes.csv")
+setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/taxis/")
+getwd()
+
+csvpath = "./df_heatmaps.csv"
+dbname = "./taxis.sqlite"
+tblname = "df_heatmaps"
+## read csv
+data <- fread(input = csvpath,
+              sep = ",",
+              header = TRUE)
+## connect to database
+conn <- dbConnect(drv = SQLite(), 
+                  dbname = dbname)
+## write table
+dbWriteTable(conn = conn,
+             name = tblname,
+             value = data)
+## list tables
+dbListTables(conn)
+## disconnect
+dbDisconnect(conn)
+
+
 
 #==============================================================================

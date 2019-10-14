@@ -1,0 +1,13 @@
+name: taxis
+title: taxis
+username:
+account: mavaladezt
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1328173
+bundleId: 2500284
+url: https://mavaladezt.shinyapps.io/taxis/
+when: 1571092409.81116
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: df_routes.csv|df_TEMP.csv|README.md|Sql_database.R|taxi_questions.R|taxi.R|taxi+_zone_lookup.csv

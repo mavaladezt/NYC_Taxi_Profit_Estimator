@@ -1,16 +1,13 @@
-fib <- function(n) {n}
+model.calculation <- function(n) {n}
 
 
 
 
+shinyServer(function(input, output, session) {
 
 
-
-
-shinyServer(function(input, output) {
-    
-    currentFib <- function() {
-        fib(as.numeric(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)-
+    currentModel <- function() {
+        model.calculation(as.numeric(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)-
             (((2*(input$car_price[2]-input$car_price[1])/input$car_life +
                             input$insurance/input$miles_year +
                             (input$tire_cost+input$breaks_cost)/input$tires_breaks +
@@ -19,13 +16,27 @@ shinyServer(function(input, output) {
                             input$gas/input$mpg +
                             input$labor/input$avg_speed) / (1-(input$time_without_trip/100)))*
                            (sum(df_overview$distance)/sum(df_overview$trips)))*sum(df_overview$trips)
-                           
             
                        ))
     }
     
+    
+
+    
+    
     output$profit <- renderInfoBox({ 
-        infoBox('Profit', prettyNum(currentFib(),big.mark=","), icon = icon("chart-line"),color='blue')})
+        infoBox('Profit', prettyNum(currentModel(),big.mark=","), icon = icon("chart-line"),color='blue')})
+    
+    output$profit_perc <- renderInfoBox({ 
+        infoBox('Profit', paste(round((currentModel()/(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)))*100,1),"%"), icon = icon("percent"),color='light-blue')})
+    
+    
+    output$profit2 <- renderInfoBox({ 
+        infoBox('Profit', prettyNum(currentModel(),big.mark=","), icon = icon("chart-line"),color='blue')})
+    
+    output$profit_perc2 <- renderInfoBox({ 
+        infoBox('Profit', paste(round((currentModel()/(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)))*100,1),"%"), icon = icon("percent"),color='light-blue')})
+    
     
     
     output$voladora <- renderPlot(
@@ -33,29 +44,10 @@ shinyServer(function(input, output) {
             geom_rect(aes(xmin=id-.45,xmax=id+.45,ymin=end,ymax=start)) +
             scale_x_discrete(labels=xlabels) +
             ggtitle("Average NYC Yellow Taxi Trip") +
-            theme(plot.title = element_text(hjust=0.5))
+            theme(plot.title = element_text(hjust=0.5)) + 
+            xlab("Revenue Concepts") + ylab("$ per trip (Avg)")
     )
-    
-        output$demand_heatmap <- renderPlot(
-            
-            df_overview[complete.cases(df_overview),] %>%
-                select(wday,range_hrs,trips) %>% 
-                mutate(trips=(trips/365)) %>% 
-                ggplot(aes(x = wday, y = range_hrs)) +
-                geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black")
-            
-        )
-        
-        output$speed_heatmap <- renderPlot(
-            
-            df_overview[complete.cases(df_overview),] %>%
-                select(wday,range_hrs,distance,duration) %>% 
-                mutate(speed=(distance/(duration/60))) %>% 
-                select(-distance,-duration) %>%     
-                ggplot(aes(x = wday, y = range_hrs)) +
-                geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white")
-        
-        )        
+
 
     
     
@@ -189,10 +181,108 @@ shinyServer(function(input, output) {
     })
     
     
+    
+    
+    
+    
+    
+    conn2 <- dbConnector(session, dbname = "./taxis.sqlite")
+
+# =============================================================================================
+    
+    dbGetOrigin_heatmaps <- function(conn) {
+        query <- "SELECT DISTINCT (Origen) FROM df_heatmaps"
+        as.data.table(dbGetQuery(conn = conn, statement = query))
+    }
+    
+    Origins <<- c("Bronx -",
+                  "Manhattan -",
+                  "Queens -",
+                  "Brooklyn -",
+                  "EWR -",
+                  "Staten Island -",
+                  "Airport",
+                  unlist(unique(dbGetOrigin_heatmaps(conn = conn2)),use.names=FALSE)  )
+#unlist(myList, use.names=FALSE)
+    updateSelectInput(session, inputId = "origin", choices = Origins,
+                      selected = 'Manhattan -')
+    
+    
+# =============================================================================================
+    
+    dbGetData_heatmaps <- function(conn, tblname, o) {
+        query <- paste0("SELECT * FROM df_heatmaps WHERE ",
+                        "Origen LIKE '%",
+                       o,
+                       "%'"
+                       )
+        as.data.table(dbGetQuery(conn = conn, statement = query))
+        
+        
+    }
+
+    observeEvent(input$origin, {
+        #temp = df_heatmaps[grepl("Manhattan -",df_heatmaps$Origen),]
+        choices = c("Bronx -",
+                    "Manhattan -",
+                    "Queens -",
+                    "Brooklyn -",
+                    "EWR -",
+                    "Staten Island -",
+                    "Airport",
+            unique(taxis_db()[grepl(input$origin,taxis_db()$Origen), 
+                                    Destino]))
+        
+        
+        updateSelectizeInput(session, inputId = "dest", choices = choices)
+        
+        
+    })    
+    
+    taxis_db <- reactive(dbGetData_heatmaps(conn = conn2,
+                                            tblname = "df_heatmaps",
+                                            o = input$origin
+                                            )
+                         )    
+    
+
+
+        
+    output$table2 <- DT::renderDataTable(DT::datatable({
+        data <- taxis_db()[grepl(input$dest,taxis_db()$Destino),c(3:7)]
+        rownames(data)=NULL
+        data
+    }))
+    
+    
+    output$demand_heatmap2 <- renderPlot(
+        taxis_db()[grepl(input$dest,taxis_db()$Destino),c(3:7)] %>% 
+        select(wday,range_hrs,trips) %>% 
+            group_by(wday,range_hrs) %>% 
+            summarize(trips=sum(trips/365)) %>% 
+            ggplot(aes(x = factor(wday), y = factor(range_hrs))) +
+            geom_tile(aes(fill = trips)) + scale_fill_gradient(low = "white", high = "black") +
+            ggtitle("Average Daily Trips")  + xlab("Day of the Week") + ylab("Hour of the Day") +
+            scale_x_discrete(labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))
+
+        
+    )
+    
 
     
-    
-    
+    output$speed_heatmap2 <- renderPlot(
+        taxis_db()[grepl(input$dest,taxis_db()$Destino),c(3:7)] %>% 
+            select(wday,range_hrs,distance,duration) %>%
+            group_by(wday,range_hrs) %>% 
+            summarize(distance=sum(distance),duration=sum(duration)) %>%
+            mutate(speed=(distance/(duration/60))) %>%
+            select(-distance,-duration) %>%
+            ggplot(aes(x = factor(wday), y = factor(range_hrs))) +
+            geom_tile(aes(fill = speed)) + scale_fill_gradient(low = "darkred", high = "white") +
+            ggtitle("Average Speed (mph)") + xlab("Day of the Week") + ylab("Hour of the Day") +
+            scale_x_discrete(labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))
+        
+    )        
     
 
     # output$avgBox <- renderInfoBox(infoBox(
