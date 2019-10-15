@@ -68,16 +68,18 @@ dbConnector <- function(session, dbname) {
     conn
 }
 
-dbGetData <- function(conn, tblname, month, day) {
-    query <- paste("SELECT * FROM",
-                   tblname,
-                   "WHERE month =",
-                   as.character(month),
-                   "AND day =",
-                   as.character(day))
-    as.data.table(dbGetQuery(conn = conn,
-                             statement = query))
-}
+#dbGetData <- function(conn, tblname, month, day) {
+#    query <- paste("SELECT * FROM",
+#                   tblname,
+#                   "WHERE month =",
+#                   as.character(month),
+#                   "AND day =",
+#                   as.character(day))
+#    as.data.table(dbGetQuery(conn = conn,
+#                             statement = query))
+#}
+
+
 
 
 

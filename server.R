@@ -217,8 +217,6 @@ shinyServer(function(input, output, session) {
                        "%'"
                        )
         as.data.table(dbGetQuery(conn = conn, statement = query))
-        
-        
     }
 
     observeEvent(input$origin, {
@@ -283,6 +281,85 @@ shinyServer(function(input, output, session) {
             scale_x_discrete(labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))
         
     )        
+    
+    
+    conn2 <- dbConnector(session, dbname = "./taxis.sqlite")
+    
+    #df_regressions <- as.data.table(dbGetQuery(conn = conn2, statement = query))
+    
+    dbGetData_regressions <- function(conn) {
+        query <- "SELECT * FROM df_regressions ORDER BY RANDOM() LIMIT 1000"
+        as.data.table(dbGetQuery(conn = conn, statement = query))
+    }
+    
+    regressions_db <- dbGetData_regressions(conn = conn2)
+#    print(summary(regressions_db$trip_distance))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    d <- reactive({
+        #print(input$dist)
+        dist <- switch(input$dist,
+                       dist = regressions_db$trip_distance,
+                       fare = regressions_db$fare_amount,
+                       duration = regressions_db$duration,
+                       regressions_db$trip_distance)
+        #print("dist",dist)
+        dist
+        #regressions_db[,1]
+    })
+    
+    output$plot <- renderPlot({
+        #dist <- input$dist
+        #label_name=colnames(d())
+        titulo = ifelse(input$dist=="dist","Distance (miles)",ifelse(input$dist=="fare","Fare per Trip","Trip Duration (minutes)"))
+        hist(d(),
+             main = paste(as.character(titulo)),
+             col = "#75AADB", border = "white",
+             xlab="Random Sample of 1000 trips")
+            
+
+    })
+    
+    
+    output$summary <- renderPrint({
+        titulo = ifelse(input$dist=="dist","Distance (miles)",ifelse(input$dist=="fare","Fare per Trip","Trip Duration (minutes)"))
+        print(titulo);print(summary(d())) 
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
     # output$avgBox <- renderInfoBox(infoBox(

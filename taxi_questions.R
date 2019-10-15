@@ -7,7 +7,7 @@ library(ggthemes)
 
 #==============================================================================
 #DF_OVERVIEW ####
-setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/taxis/")
+setwd("/Users/mavt/Dropbox/School/NYCDataScience/Projects/Shiny/")
 getwd()
 
 #df <- fread("trips_2019_01_to_06.csv")

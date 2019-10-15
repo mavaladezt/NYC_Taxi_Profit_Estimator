@@ -22,6 +22,7 @@ shinyUI(dashboardPage(
                 icon = icon("stream")
             ),
             menuItem("Data", tabName = "data", icon = icon("database")),
+            menuItem("Distribution", tabName = "distribution", icon = icon("database")),
             menuItem("Assumptions", tabName = "assumptions", icon = icon("list")),
             menuItem("About", tabName = "about", icon = icon("address-card"))
         )
@@ -266,7 +267,61 @@ fluidRow(box(
                     DT::dataTableOutput("table"), width = 12
                 ))),
         
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tabItem(tabName = "distribution",
+        # datatable
+        fluidRow(box(
+            
+            radioButtons("dist", "Variable:",
+                         c("Distance" = "dist",
+                           "Fare" = "fare",
+                           "Duration" = "duration"))
+            
+        )
         
+        ),fluidRow(
+            
+            box(
+                
+                tabsetPanel(type = "tabs",
+                            tabPanel("Plot", plotOutput("plot")),
+                            tabPanel("Summary", verbatimTextOutput("summary"))
+                            
+                            
+                )
+            )
+        )),
+
+
+
+
+
+
+
+
+
+
+
+
         
         
         tabItem(tabName = "assumptions",
