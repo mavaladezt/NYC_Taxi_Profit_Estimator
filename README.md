@@ -1,6 +1,13 @@
 <h2>NYC Yellow Taxi Estimator</h2>
 <p>This Shiny App is meant for estimating the profit of the NYC Yellow Taxis.</p>
-<p>I am not claiming that the model is accurate but it is a tool for determining fare increases/cost analysis.</p>
+<p>For the model to be accurate, all variables need to be calibrated.</p>
+<p>&nbsp;</p>
+<h3>Questions to Answer:</h3>
+<p>Data was obtained from</p>
+<p>Working with 2019 data (Jan-Jun).</p>
+<ul>
+<li>Filtered transactions that had duration of more than 2 hrs.</li>
+
 <p>&nbsp;</p>
 <h3>Data</h3>
 <p>Data was obtained from:&nbsp;<a href="https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page">https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page</a></p>
@@ -30,4 +37,4 @@ https://mavaladezt.shinyapps.io/taxis/
 
 <p>&nbsp;</p>
 <h3>Large Files Link</h3>
-https://www.dropbox.com/s/0joy4e2t26zdiwz/datafiles.zip?dl=0
+https://www.dropbox.com/s/tm27ghs20ovpzc3/datafiles.zip?dl=0
