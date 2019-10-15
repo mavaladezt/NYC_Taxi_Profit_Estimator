@@ -3,10 +3,11 @@
 <p>For the model to be accurate, all variables need to be calibrated.</p>
 <p>&nbsp;</p>
 <h3>Questions to Answer:</h3>
-<p>Data was obtained from</p>
-<p>Working with 2019 data (Jan-Jun).</p>
+
 <ul>
-<li>Filtered transactions that had duration of more than 2 hrs.</li>
+<li>How much profit do the NYC yellow taxi industry generates</li>
+<li>Which is the most important cost? How sensible it is to increases?</li>
+<li>Which is the distribution of distances, fares and duration of the trips?</li>
 
 <p>&nbsp;</p>
 <h3>Data</h3>
