@@ -30,12 +30,8 @@
 
 <p>&nbsp;</p>
 <h3>Takeaways</h3>
-<p>The main takeaways of the App is that labor cost is the main deciding factor in taxi business.</p>
+<p>The main takeaways of the study can be found in the 'NYC Yellow Taxis Profitability.pdf' file.</p>
 
 <p>&nbsp;</p>
 <h3>Shinny App Link</h3>
 https://mavaladezt.shinyapps.io/taxis/
-
-<p>&nbsp;</p>
-<h3>Large Files Link</h3>
-https://www.dropbox.com/s/tm27ghs20ovpzc3/datafiles.zip?dl=0
