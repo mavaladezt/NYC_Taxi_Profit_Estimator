@@ -1,6 +1,5 @@
 *.csv
 *.txt
-*.pdf
 *.key
 *.sqlite
 *.xlsx
