@@ -5,25 +5,18 @@
 
 #   AGREGAR GRAFICAS POR DAY OF THE WEEK, BOROUGH, HEATMAP WITH DAY OF THE WEEK AND RANGE_HRS
 
-shinyUI(dashboardPage(
+shinyUI(dashboardPage(skin = "black",
     dashboardHeader(title = 'NYC Yellow Taxis'),
     dashboardSidebar(
         sidebarUserPanel("NYC Yellow Taxis"),
         sidebarMenu(
             menuItem("Overview", tabName = "overview", icon = icon("globe")),
-            menuItem(
-                "Model",
-                tabName = "model",
-                icon = icon("project-diagram")
-            ),
-            menuItem(
-                "Trips/Speed Heatmaps",
-                tabName = "heatmaps",
-                icon = icon("stream")
-            ),
-            menuItem("Data", tabName = "data", icon = icon("database")),
-            menuItem("Distribution", tabName = "distribution", icon = icon("database")),
+#            menuItem("Model", tabName = "model",icon = icon("project-diagram")),
+            menuItem("Trips/Speed Heatmaps",tabName = "heatmaps",icon = icon("stream")),
+            menuItem("Profit per Route", tabName = "data", icon = icon("database")),
+            menuItem("Usage Distribution", tabName = "distribution", icon = icon("chart-bar")),
             menuItem("Assumptions", tabName = "assumptions", icon = icon("list")),
+            menuItem("Model", tabName = "model",icon = icon("project-diagram")),
             menuItem("About", tabName = "about", icon = icon("address-card"))
         )
     ),
@@ -31,7 +24,7 @@ shinyUI(dashboardPage(
         tabItem(
 # Tab: Overview####
             tabName = "overview",
-            titlePanel(tags$h4("Estimated 2019")),
+            titlePanel(HTML("<h2>Estimated 2019</h2>")),
     
 fluidRow(               
 
@@ -93,7 +86,7 @@ fluidRow(box(
                         max = 500000,
                         value = 200000,
                         post = " mi",
-                        step = 5000,
+                        step = 2000,
                         animate = TRUE
                     )
                 ),
@@ -107,6 +100,7 @@ fluidRow(box(
                         min = 2000,
                         max = 5000,
                         value = 3500,
+                        step=350,
                         animate = TRUE
                     )
                 )
@@ -121,9 +115,9 @@ fluidRow(box(
                         "tires_breaks",
                         "Tires & Breaks Life:",
                         min = 35000,
-                        max = 80000,
+                        max = 100000,
                         value = 50000,
-                        step = 1000,
+                        step = 5000,
                         post = " mi",
                         sep = ",",
                         animate = TRUE
@@ -170,7 +164,7 @@ fluidRow(box(
                         min = 2000,
                         max = 50000,
                         value = 10000,
-                        step = 500,
+                        step = 1000,
                         post = " mi",
                         #pre = "$",
                         sep = ",",
@@ -196,7 +190,7 @@ fluidRow(box(
                         min = 2,
                         max = 5,
                         value = 3.5,
-                        step = .10,
+                        step = .35,
                         #post = " mi",
                         pre = "$",
                         sep = ",",
@@ -208,7 +202,7 @@ fluidRow(box(
                         min = 10,
                         max = 60,
                         value = 20,
-                        step = .5,
+                        step = 2,
                         post = " mpg",
                         #pre = "$",
                         sep = ",",
@@ -226,7 +220,7 @@ fluidRow(box(
                         min = 10,
                         max = 40,
                         value = 20,
-                        step = 0.5,
+                        step = 2,
                         post = " /hr",
                         pre = "$",
                         sep = ",",
@@ -247,6 +241,8 @@ fluidRow(box(
             )
  
 # Calculations for Troubleshooting####                   
+
+
 #            ,
 #            fluidRow(tableOutput("values"))
         
@@ -263,9 +259,12 @@ fluidRow(box(
 
         tabItem(tabName = "data",
                 # datatable
-                fluidRow(box(
-                    DT::dataTableOutput("table"), width = 12
-                ))),
+                fluidRow(column(12,
+                                
+                                HTML("<h2>Profit per Route</h2>"))
+                    ,
+                    DT::dataTableOutput("table")
+                )),
         
     
 
@@ -288,6 +287,7 @@ fluidRow(box(
 
 
 tabItem(tabName = "distribution",
+        fluidRow(column(12,HTML("<h2>Basic Usage Information</h2>"))),
         # datatable
         fluidRow(box(
             
@@ -304,7 +304,8 @@ tabItem(tabName = "distribution",
                 
                 tabsetPanel(type = "tabs",
                             tabPanel("Plot", plotOutput("plot")),
-                            tabPanel("Summary", verbatimTextOutput("summary"))
+                            tabPanel("Summary", verbatimTextOutput("summary")),
+                            tabPanel("Proportion Table", verbatimTextOutput("proptable"))
                             
                             
                 )
@@ -422,6 +423,7 @@ tabItem(tabName = "distribution",
         
         ,
         tabItem(tabName = "heatmaps",
+                fluidRow(column(12,HTML("<h2>Usage vs Speed</h2>"))),
                 # datatable
                 fluidRow(box(plotOutput("demand_heatmap2")),
                          box(plotOutput("speed_heatmap2")
@@ -437,6 +439,6 @@ tabItem(tabName = "distribution",
                                                           selected = "Manhattan -"),
                                            selectizeInput(inputId = "dest", 
                                                           label = "Destination",
-                                                          choices = NULL))),fluidRow(column(12,dataTableOutput("table2"))))
+                                                          choices = NULL))))
     ))
 ))

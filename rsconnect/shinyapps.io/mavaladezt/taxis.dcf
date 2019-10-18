@@ -5,9 +5,9 @@ account: mavaladezt
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1328173
-bundleId: 2501110
+bundleId: 2512572
 url: https://mavaladezt.shinyapps.io/taxis/
-when: 1571122149.33945
+when: 1571426635.93156
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: data_cleanup_regressions.R|data_cleanup_taxi.R|df_routes.csv|df_TEMP.csv|Sql_database.R|taxi_questions.R|taxi+_zone_lookup.csv
+ignoredFiles: data_cleanup_regressions.R|data_cleanup_taxi.R|df_routes.csv|df_TEMP.csv|NYC Yellow Taxis Profitability.pdf|Sql_database.R|taxi_questions.R|taxi+_zone_lookup.csv

@@ -28,14 +28,14 @@ shinyServer(function(input, output, session) {
         infoBox('Profit', prettyNum(currentModel(),big.mark=","), icon = icon("chart-line"),color='blue')})
     
     output$profit_perc <- renderInfoBox({ 
-        infoBox('Profit', paste(round((currentModel()/(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)))*100,1),"%"), icon = icon("percent"),color='light-blue')})
+        infoBox('Profit', paste(round((currentModel()/sum(df_overview$amount_total))*100,1),"%"), icon = icon("percent"),color='light-blue')})
     
     
     output$profit2 <- renderInfoBox({ 
         infoBox('Profit', prettyNum(currentModel(),big.mark=","), icon = icon("chart-line"),color='blue')})
     
     output$profit_perc2 <- renderInfoBox({ 
-        infoBox('Profit', paste(round((currentModel()/(sum(df_overview$amount_fare)+sum(df_overview$amount_extra)))*100,1),"%"), icon = icon("percent"),color='light-blue')})
+        infoBox('Profit', paste(round((currentModel()/sum(df_overview$amount_total))*100,1),"%"), icon = icon("percent"),color='light-blue')})
     
     
     
@@ -137,8 +137,30 @@ shinyServer(function(input, output, session) {
 #                                                FALSE]))
     
     output$table <- DT::renderDataTable({
-        datatable(df_data, selection='single',rownames = FALSE,filter="top",options = list(sDom  = '<"top">lrt<"bottom">ip')) %>%
-            formatCurrency(columns=c('Fare','Extra',"MTA","Tip","Tolls","Improv.","Total")) %>% 
+        factor_=(2*(input$car_price[2]-input$car_price[1])/input$car_life +
+                    input$insurance/input$miles_year +
+                    (input$tire_cost+input$breaks_cost)/input$tires_breaks +
+                    input$oil_cost/input$oil_change +
+                    input$other/input$other_maintenance +
+                    input$gas/input$mpg +
+                    input$labor/input$avg_speed) / (1-(input$time_without_trip/100))
+        
+        df_data %>% select(-MTA,-Tip,-Tolls,-Improv.,-Total) %>% 
+            mutate(Total=Fare+Extra,
+                   Estimated.Cost=((2*(input$car_price[2]-input$car_price[1])/input$car_life +
+                            input$insurance/input$miles_year +
+                            (input$tire_cost+input$breaks_cost)/input$tires_breaks +
+                            input$oil_cost/input$oil_change +
+                            input$other/input$other_maintenance +
+                            input$gas/input$mpg +
+                            input$labor/(Distance/(Avg.Mins/60))) / (1-(input$time_without_trip/100)))*Distance
+                   
+                   ,
+                   Profit=Total-Estimated.Cost,
+                   Profit.Hr=Profit/(Avg.Mins/60),
+                   Total.Profit=(Total-Estimated.Cost)*Trips) %>% 
+        datatable(selection='single',rownames = FALSE,filter="top",options = list(sDom  = '<"top">lrt<"bottom">ip')) %>%
+            formatCurrency(columns=c('Fare','Extra','Total','Estimated.Cost','Profit','Profit.Hr','Total.Profit')) %>% 
             formatRound(columns = c("Distance","Avg.Mins","Trips"),digits = 0)  
             #formatStyle(input$selected,
             #            background = "skyblue",
@@ -332,7 +354,7 @@ shinyServer(function(input, output, session) {
         titulo = ifelse(input$dist=="dist","Distance (miles)",ifelse(input$dist=="fare","Fare per Trip","Trip Duration (minutes)"))
         hist(d(),
              main = paste(as.character(titulo)),
-             col = "#75AADB", border = "white",
+             col = "#394652", border = "white",
              xlab="Random Sample of 1000 trips")
             
 
@@ -344,28 +366,17 @@ shinyServer(function(input, output, session) {
         print(titulo);print(summary(d())) 
     })
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    output$proptable <- renderPrint({
+        titulo = ifelse(input$dist=="dist","Range.Miles",ifelse(input$dist=="fare","Range.Fare","Range.Duration"))
+#        print(d()) 
+        temp <- as.data.frame(table(cut(d(), breaks=seq(min(d()),max(d()), by=(max(d())-min(d()))/10 ))))
+        temp[,2] = round(100*temp[,2]/1000,2)
+        colnames(temp)<-c(titulo,'%')
+        temp
+    })
     
     
     
     
 
-    # output$avgBox <- renderInfoBox(infoBox(
-    #     paste("AVG.", input$selected),
-    #     mean(state_stat[, input$selected]),
-    #     icon = icon("calculator"),
-    #     fill = TRUE
-    # ))
 })
