@@ -30,8 +30,10 @@
 
 <p>&nbsp;</p>
 <h3>Takeaways</h3>
-<p>The main takeaways of the study can be found in the 'NYC Yellow Taxis Profitability.pdf' file.</p>
+<p>The main takeaways of the study can be found in the following blog post.</p>
+https://nycdatascience.com/blog/r/nyc-yellow-taxi-usage-and-profitability/
 
 <p>&nbsp;</p>
 <h3>Shinny App Link</h3>
 https://mavaladezt.shinyapps.io/taxis/
+
